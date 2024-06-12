@@ -26,3 +26,6 @@ In the future, to deactivate venv
 pip install -r requirements.txt
 
 ## Run flask
+flask run
+OR
+python app.py

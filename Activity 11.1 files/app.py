@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 @app.route("/", methods=["GET"])
 def first_route():
-    return "My first GET request"
+    return render_template("index.html", full_name="Andrew Buensalida")
     
     
  
