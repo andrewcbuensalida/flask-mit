@@ -1,0 +1,17 @@
+<!doctype html>
+<html>
+    <head>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <a href = "/login">Register></a>
+            <a href = "/books">List Books></a>
+          </nav>          
+    </head>
+    <body>
+            {%if username %}
+                <h1> Welcome {{username}}</h1>
+            {%endif%}
+            <div id="content">
+            {%block content %}{%endblock%}
+            </div>
+    </body>
+</html>

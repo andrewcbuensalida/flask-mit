@@ -1,0 +1,3 @@
+
+# Flask==1.1.2 # this is not working. errors with ImportError: cannot import name 'escape' from 'jinja2' when running flask run
+Flask=3.0.3
