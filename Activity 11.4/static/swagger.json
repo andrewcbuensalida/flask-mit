@@ -1,0 +1,180 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "1.0.0", 
+        "title": "Books Project CRUD",
+        "description": "jrw@mit.edu User Project Application API",
+        "license": {
+            "name": "MIT",
+            "url": "https://opensource.org/licenses/MIT"
+        }
+    },
+    
+    "host": "localhost:5000",
+    "basePath": "/",
+    "tags": [
+        {
+            "name": "Default",
+            "description": "API for users in the system"
+        }
+    ],
+    "summary": "Default route ",
+    "description": "Default route in system",
+    "schemes": [
+        "http"
+    ],
+    "consumes": [
+        "application/json"
+    ],
+    "produces": [
+        "application/json"
+    ],
+
+    "securityDefinitions":{
+        "Bearer":{
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    },
+    "paths": {
+        "/login": {
+            "post": {
+                "tags": ["user"],
+                "summary": "Add User",
+                "consumes":[
+                    "multipart/form-data"
+                ],
+                "parameters": [
+                    {
+                        "name": "username",
+                        "in": "formData",
+                        "description": "Username to register",
+                        "type":"string"
+                    },{
+                        "name": "password",
+                        "in": "formData",
+                        "description": "Password to register",
+                        "type":"string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/user"
+                        }
+                    }
+                }
+            }
+        },
+        "/books": {
+            "get": {
+                "security": {
+                    "Bearer": []},
+                "tags": ["books"],
+                "summary": "Get all Books in system",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/book"
+                        }
+                    }
+                }
+            }
+        },
+        "/addbook": {
+            "post": {
+                "tags": ["books"],
+                "summary": "Create new book ",
+                "description": "Create new book in system",
+                "security":{
+                    "Bearer": [ ]
+                },
+                "consumes":[
+                    "multipart/form-data"
+                ],
+                "parameters": [
+                    {
+                        "name": "author",
+                        "in": "formData",
+                        "description": "author",
+                        "type":"string"
+                    },
+                    {
+                        "name": "title",
+                        "in": "formData",
+                        "description": "title",
+                        "type":"string"
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "New book is created",
+                        "schema": {
+                            "$ref": "#/definitions/book"
+                        }
+                    }
+                }
+            }
+        },
+        "/book/{id}": {
+            "parameters": [
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "description": "ID of book that we want to delete",
+                    "type": "integer"
+                }
+            ],
+            "delete": {
+                "tags": ["book"],
+                "summary": "Delete Book",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/book"
+                        }
+                    }
+                }
+            }
+        }
+  
+    },
+    "definitions": {
+        "book": {
+            "required": ["id","title","author"],
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "uniqueItems": true
+                },
+                "author": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "user": {
+            "required": ["username","password"],
+            "properties": {
+                "username": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}
+
+
