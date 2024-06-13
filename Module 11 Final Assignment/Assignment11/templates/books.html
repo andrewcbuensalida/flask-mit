@@ -1,0 +1,18 @@
+{% extends "index.html"%} {% block content %}
+<div class="container" style="padding: 10px">
+	<!-- <h1>{{title}}</h1> -->
+	<br />
+	<div id="toolbar"></div>
+
+	<table
+		class="table table-striped"
+		id="table"
+		data-toggle="true"
+		data-toolbar="#toolbar"
+		data-search="true"
+		data-show-columns="true"
+		data-pagination="true"
+		data-height="500"
+	></table>
+</div>
+{% endblock %}
