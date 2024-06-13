@@ -26,8 +26,8 @@ In the future, to deactivate venv
 pip install -r requirements.txt
 
 ## Run flask
-flask run
-add --debug for live reload
+flask run --debug
+--debug is for live reload
 OR
 python app.py
 

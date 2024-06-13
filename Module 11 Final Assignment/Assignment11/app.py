@@ -2,6 +2,7 @@ from flask import Flask, request, render_template, session, make_response
 from flask import redirect
 from functools import wraps
 import os
+
 app = Flask(__name__)
 app.secret_key = "secretkey"
 app.config["UPLOADED_PHOTOS_DEST"] = "static"
@@ -15,7 +16,7 @@ books = [
         "pages": 209,
         "title": "The Mystery of Capital",
         "year": 1970,
-        "price":20.17
+        "price": 20.17,
     },
     {
         "id": 2,
@@ -25,7 +26,7 @@ books = [
         "pages": 784,
         "title": "Fairy tales",
         "year": 1836,
-        "price":35.00
+        "price": 35.00,
     },
     {
         "id": 3,
@@ -35,7 +36,7 @@ books = [
         "pages": 928,
         "title": "The Divine Comedy",
         "year": 1315,
-        "price":16.00
+        "price": 16.00,
     },
     {
         "id": 4,
@@ -45,7 +46,7 @@ books = [
         "pages": 100,
         "title": "Romeo and Juliet",
         "year": 1597,
-        "price":60.00
+        "price": 60.00,
     },
     {
         "id": 5,
@@ -55,7 +56,7 @@ books = [
         "pages": 100,
         "title": "Hamlet",
         "year": 1603,
-        "price":30.00
+        "price": 30.00,
     },
     {
         "id": 6,
@@ -65,7 +66,7 @@ books = [
         "pages": 100,
         "title": "Macbeth",
         "year": 1623,
-        "price":25.90
+        "price": 25.90,
     },
 ]
 
@@ -96,6 +97,11 @@ columns = [
         "sortable": True,
     },
     {
+        "field": "year",
+        "title": "year",
+        "sortable": True,
+    },
+    {
         "field": "price",
         "title": "price",
         "sortable": True,
@@ -115,7 +121,7 @@ def loginrequired(fn):
             if user["username"] == fromBrowser:
                 return fn(*args, **kwargs)
         # otherwise send user to register
-        return redirect("static/register.html")
+        return redirect("/login")
 
     return decorator
 
@@ -140,9 +146,7 @@ def login():
         if checkUser(username, password):
             # set session token to users name
             session["username"] = username
-            return render_template(
-                "index.html", username=session["username"]
-            )
+            return render_template("index.html", username=session["username"])
         else:
             return render_template("register.html")
     elif request.method == "GET":
@@ -157,15 +161,13 @@ def logout():
 
 
 @app.route("/books", methods=["GET"])
+@loginrequired
 def getBooks():
-    # Exercise = Use a try block on the /books route.
     # If the session exists then render the books.html
     # If it doesn't send the user to register.html
     try:
         user = session["username"]
-        print('this is user: ' , user)
-        print('this is books: ' , books)
-        return render_template('books.html', username=user, data=books, columns=columns)
+        return render_template("books.html", username=user, data=books, columns=columns)
     except Exception as err:
         print(f"Unexpected {err=}, {type(err)=}")
         return render_template("register.html")
@@ -205,27 +207,47 @@ def addimage():
 
     return "all done"
 
+
+# example url: http://localhost:5000/buybook?bookId=1
 @app.route("/buybook")
+@loginrequired
 def buybook():
-    # get the book id parameter passed in the URL:
-
-    user = session["username"]
-
-    #add Cookie  booksToPurchase here
-
-
     bookIdParam = request.args.get("bookId")
-
-    booksCookie = ""
+    booksCookie = request.cookies.get("booksToPurchase")
+    if booksCookie:
+        books_cookie_list = booksCookie.split(",")
+    else:
+        books_cookie_list = []
 
     ## initialize booksToPurchse with items in shopping cart (items in cookie)
-    booksCookie = request.cookies.get("booksToPurchase")
+    booksToPurchase = []
+    # convert book ids in cookie to actual book objects from db
+    for bookId_in_cookie in books_cookie_list:
+        for book_in_db in books:
+            if str(book_in_db["id"]) == bookId_in_cookie:
+                booksToPurchase.append(book_in_db)
 
-    
-    ## set the cookie -  add code here
-    
+    if bookIdParam:
+        # instead of for loop like above, you can use filter
+        matches = list(filter(lambda book: str(book["id"]) == bookIdParam, books))
 
-    return response;
+        # if the bookId exists in the db
+        if len(matches) > 0:
+            found_book = matches[0]
+            booksToPurchase.append(found_book)
+        else:
+            return "No book found with that id"
+    else:
+        return "No bookId provided"
+
+    booksToPurchaseIds = [str(book["id"]) for book in booksToPurchase]
+    new_booksCookie = ",".join(booksToPurchaseIds)
+    response = make_response(
+        render_template("buybook.html", data=booksToPurchase, columns=columns)
+    )
+    response.set_cookie("booksToPurchase", new_booksCookie)
+
+    return response
 
 
 if __name__ == "__main__":
